@@ -76,7 +76,7 @@ int main(int argc, char ** argv) {
     if(getcwd(path, MAX_SIZE) == NULL) ERROR("getcwd");
     for(int i = 1; i < argc; i++) {
         if(chdir(argv[i])) {
-            fprintf(stderr, "No access to folder %s", argv[i++]);
+            fprintf(stderr, "No access to folder \"%s\"\n", argv[i++]);
             continue;
         }
         i++;
