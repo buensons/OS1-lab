@@ -38,10 +38,10 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#define MAX_SIZE 101
-#define ERROR(source) (perror(source), fprintf(stderr, "%s:%d\n", __FILE__, __LINE__), exit(EXIT_FAILURE))
 
-extern int errno;
+#define MAX_SIZE 101
+#define FILE_NAME "file.txt"
+#define ERROR(source) (perror(source), fprintf(stderr, "%s:%d\n", __FILE__, __LINE__), exit(EXIT_FAILURE))
 
 void usage(char * pname) {
     printf("Usage: %s PATH BYTES ...\n", pname);
@@ -70,24 +70,22 @@ int scan_dir(int size) {
 }
 int main(int argc, char ** argv) {
     char path[MAX_SIZE];
-    int s;
     FILE * file;
-    if((file = fopen("file.txt", "a")) == NULL) ERROR("fopen");
+    if((file = fopen(FILE_NAME, "a")) == NULL) ERROR("fopen");
     if(getcwd(path, MAX_SIZE) == NULL) ERROR("getcwd");
     for(int i = 1; i < argc; i++) {
         if(chdir(argv[i])) {
             fprintf(stderr, "No access to folder \"%s\"\n", argv[i++]);
             continue;
         }
-        i++;
-        if(i >= argc) usage(argv[0]);
-        s = atoi(argv[i]);
-        if(scan_dir(s) == 0) {
+        if(++i >= argc) usage(argv[0]);
+        if(scan_dir(atoi(argv[i])) == 0) {
             printf("%s\n", argv[i-1]);
             fprintf(file, "%s\n", argv[i-1]);
         }
         if(chdir(path)) ERROR("chdir");
     }
     if(fclose(file)) ERROR("fclose");
+    //if(unlink(FILE_NAME) && errno != ENOENT) ERROR("unlink");
     return EXIT_SUCCESS;
 }
